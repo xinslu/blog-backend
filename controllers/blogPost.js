@@ -1,7 +1,7 @@
 const Blog=require('../database/blog')
 const blogPost=(req,res,next)=>{
-    const {timeStamp,title,preview,blogText}=req.body
-    if (!timeStamp || !title || !preview || !blogText){
+    const {timeStamp,subject,title,preview,blogText}=req.body
+    if (!timeStamp || !title || !preview || !blogText || !subject){
         return res.status(400).send({
                 success: false,
                 message: 'Error: All field must be filled cannot be blank.'
@@ -11,6 +11,7 @@ const blogPost=(req,res,next)=>{
             try{
                 const newBlogPost= new Blog();
                 newBlogPost.timeStamp=timeStamp;
+                newBlogPost.subject=subject;
                 newBlogPost.title=title;
                 newBlogPost.preview=preview;
                 newBlogPost.blogText=blogText;
