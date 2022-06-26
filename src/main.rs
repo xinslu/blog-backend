@@ -7,6 +7,7 @@ mod handlers;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer, web};
 use std::io::{Error, ErrorKind};
+use std::env;
 
 
 #[actix_web::main]
@@ -15,6 +16,8 @@ async fn main() -> std::io::Result<()> {
         Ok(Some(db)) => {
             println!( "here");
             let db_data = Data::new(db);
+            let host = env::var("HOST").expect("Host not set");
+            let port = env::var("PORT").expect("Port not set");
             HttpServer::new(move || {
                 App::new()
                 .app_data(db_data.clone())
@@ -22,7 +25,7 @@ async fn main() -> std::io::Result<()> {
                 .route("/getblogpost",web::post().to(handlers::get_blog::get_blog))
 
             })
-            .bind(("127.0.0.1", 8080))?
+            .bind(format!("{}:{}", host, port))?
             .run()
             .await
         },
