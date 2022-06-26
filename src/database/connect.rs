@@ -1,3 +1,4 @@
+use mongodb::results::InsertOneResult;
 use futures::StreamExt;
 use crate::database::model::*;
 use mongodb::{Collection, bson::{doc, extjson::de::Error, oid::ObjectId}, options::ClientOptions, Client, };
@@ -40,6 +41,24 @@ impl MongoRepo<Blog> {
          }
         Ok(blogs)
 
+    }
+
+
+    pub async fn post_blog(&self, new_blog: Blog) ->  Result<InsertOneResult, Error> {
+        let new_doc = Blog {
+            id: None,
+            timeStamp: new_blog.timeStamp,
+            title: new_blog.title,
+            subject: new_blog.subject,
+            preview: new_blog.preview,
+            blogText: new_blog.blogText
+        };
+        return Ok(self
+            .col
+            .insert_one(new_doc, None)
+            .await
+            .ok()
+            .expect("Error creating user"));
     }
 
 }

@@ -18,6 +18,7 @@ async fn main() -> std::io::Result<()> {
             HttpServer::new(move || {
                 App::new()
                 .app_data(db_data.clone())
+                .route("/",web::post().to(handlers::post_blog::post_blog))
                 .route("/getblogpost",web::post().to(handlers::get_blog::get_blog))
 
             })
