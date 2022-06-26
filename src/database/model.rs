@@ -6,6 +6,7 @@ pub struct Blog {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
     pub timeStamp: String,
+    pub subject: String,
     pub title: String,
     pub preview: String,
     pub blogText: String
