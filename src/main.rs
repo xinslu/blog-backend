@@ -13,6 +13,7 @@ use std::io::{Error, ErrorKind};
 async fn main() -> std::io::Result<()> {
     match database::connect::MongoRepo::init().await {
         Ok(Some(db)) => {
+            println!( "here");
             let db_data = Data::new(db);
             HttpServer::new(move || {
                 App::new()

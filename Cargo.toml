@@ -10,8 +10,5 @@ actix-web = "4"
 tokio = "1.19.2"
 dotenv = "0.15.0"
 serde = "1.0.137"
-
-[dependencies.mongodb]
-version = "2.2.2"
-default-features = false
-features = ["async-std-runtime"]
+futures = "0.3.21"
+mongodb = "2.2.2"
