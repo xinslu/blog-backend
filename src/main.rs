@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
             HttpServer::new(move || {
                 App::new()
                 .app_data(db_data.clone())
-                .route("",web::get().to(handlers::warmup::hello))
+                .route("/getblogpost",web::post().to(handlers::get_blog::get_blog))
 
             })
             .bind(("127.0.0.1", 8080))?

@@ -1,5 +1,5 @@
 use crate::database::model::*;
-use mongodb::{Collection, bson::doc, options::ClientOptions, Client};
+use mongodb::{Collection, bson::{doc, extjson::de::Error, oid::ObjectId}, options::ClientOptions, Client, };
 use dotenv;
 pub struct MongoRepo<Blog> {
     col: Collection<Blog>,
@@ -19,6 +19,18 @@ impl MongoRepo<Blog> {
         Ok(None)
     }
 
+
+    pub async fn get_blog(&self, id: &String) -> Result<Blog, Error> {
+        let obj_id = ObjectId::parse_str(id)?;
+        let filter = doc! {"_id": obj_id};
+        let blog_detail = self
+            .col
+            .find_one(filter, None)
+            .await
+            .ok()
+            .expect("Error getting blog");
+        Ok(blog_detail.unwrap())
+    }
 
 }
 
