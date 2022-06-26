@@ -5,6 +5,7 @@ mod handlers;
 
 //Dependencies
 use actix_web::web::Data;
+use actix_cors::Cors;
 use actix_web::{App, HttpServer, web};
 use std::io::{Error, ErrorKind};
 use std::env;
@@ -14,13 +15,13 @@ use std::env;
 async fn main() -> std::io::Result<()> {
     match database::connect::MongoRepo::init().await {
         Ok(Some(db)) => {
-            println!( "here");
             let db_data = Data::new(db);
             let host = env::var("HOST").expect("Host not set");
             let port = env::var("PORT").expect("Port not set");
             HttpServer::new(move || {
                 App::new()
                 .app_data(db_data.clone())
+                .wrap(Cors::permissive())
                 .route("/",web::post().to(handlers::post_blog::post_blog))
                 .route("/getblogpost",web::post().to(handlers::get_blog::get_blog))
 
