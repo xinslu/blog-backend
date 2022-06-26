@@ -1,44 +1,34 @@
+// Modules
+mod database;
 mod handlers;
-use actix_web::{App, HttpServer, web};
-use mongodb::{bson::doc, options::ClientOptions, Client};
-use dotenv;
-use std::io::{Error, ErrorKind};
 
+
+//Dependencies
+use actix_web::web::Data;
+use actix_web::{App, HttpServer, web};
+use std::io::{Error, ErrorKind};
 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    if let Err(error) = mongo_connect().await{
-        return Err(Error::new(ErrorKind::Other, error.to_string()));
-    }
-    HttpServer::new(|| {
-        App::new()
-        .route("",web::get().to(handlers::warmup::hello))
+    match database::connect::MongoRepo::init().await {
+        Ok(Some(db)) => {
+            let db_data = Data::new(db);
+            HttpServer::new(move || {
+                App::new()
+                .app_data(db_data.clone())
+                .route("",web::get().to(handlers::warmup::hello))
 
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+            })
+            .bind(("127.0.0.1", 8080))?
+            .run()
+            .await
+        },
+        Ok(None) => return Err(Error::new(ErrorKind::Other, "Could Not Connect to MongoDB")),
+        Err(error) => return Err(Error::new(ErrorKind::Other, error.to_string())),
+    }
 }
 
 
-async fn mongo_connect() -> mongodb::error::Result<()>  {
-    if let Some(connection_string) = dotenv::var("MONGO_URI").ok() {
-         let mut client_options =
-        ClientOptions::parse(connection_string)
-            .await?;
-    client_options.app_name = Some("Blog Articles".to_string());
-    let client = Client::with_options(client_options)?;
-    client
-        .database("admin")
-        .run_command(doc! {"ping": 1}, None)
-        .await?;
-    println!("Connected successfully.");
-    for db_name in client.list_database_names(None, None).await? {
-        println!("{}", db_name);
-    }
-    return Ok(());
-    }
-    Ok(())
-}
+
 
